@@ -1,0 +1,85 @@
+//fb-pgrb
+package com.example.mul1
+
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var emailEditText: EditText
+    private lateinit var passwordEditText: EditText
+    private lateinit var loginButton: Button
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        // Firebase Realtime Database reference
+        val database = Firebase.database
+        val myRef = database.getReference("users")
+
+        // UI elements
+        emailEditText = findViewById(R.id.emailEditText)
+        passwordEditText = findViewById(R.id.passwordEditText)
+        loginButton = findViewById(R.id.loginButton)
+
+        loginButton.setOnClickListener {
+            val email = emailEditText.text.toString()
+            val password = passwordEditText.text.toString()
+
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                val userData = mapOf(
+                    "email" to email,
+                    "password" to password
+                )
+
+                myRef.push().setValue(userData)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Data saved to Firebase 😎", Toast.LENGTH_SHORT).show()
+                        emailEditText.text.clear()
+                        passwordEditText.text.clear()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Failed to save 😵", Toast.LENGTH_SHORT).show()
+                    }
+            } else {
+                Toast.makeText(this, "Fill all fields 💡", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+}
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/emailEditText"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <EditText
+        android:id="@+id/passwordEditText"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/loginButton"
+        android:text="Login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"/>
+
+</LinearLayout>
